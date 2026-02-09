@@ -136,8 +136,16 @@ export function Header({ status, onMenuClick }: HeaderProps) {
         )}
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-3">
-            <h1 className="glitch-wrapper text-[16px] font-black tracking-tighter text-white uppercase italic leading-none hidden sm:block" data-text="MISSION CONTROL">MISSION CONTROL</h1>
-            <h1 className="text-[16px] font-black tracking-tighter text-white uppercase italic leading-none sm:hidden">MC</h1>
+            <h1 className="glitch-wrapper text-[16px] font-black tracking-tighter text-white uppercase italic leading-none hidden sm:flex items-center gap-2" data-text="MISSION CONTROL">
+              <span>🌙</span>
+              <span>AYDA</span>
+              <span className="text-gray-600">·</span>
+              <span>MISSION CONTROL</span>
+            </h1>
+            <h1 className="text-[16px] font-black tracking-tighter text-white uppercase italic leading-none sm:hidden flex items-center gap-1">
+              <span>🌙</span>
+              <span>AYDA</span>
+            </h1>
             <div className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center">
               <span className="text-[9px] font-bold text-blue-500 uppercase tracking-wider leading-none">v2.4</span>
             </div>
