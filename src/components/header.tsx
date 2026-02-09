@@ -135,11 +135,11 @@ export function Header({ status, onMenuClick }: HeaderProps) {
           </button>
         )}
         <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-3">
-            <h1 className="glitch-wrapper text-[16px] font-black tracking-tighter text-white uppercase italic leading-none hidden sm:block" data-text="🌙 AYDA · MISSION CONTROL">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h1 className="glitch-wrapper text-[14px] sm:text-[16px] font-black tracking-tighter text-white uppercase italic leading-none hidden sm:block" data-text="🌙 AYDA · MISSION CONTROL">
               <span className="glitch-text">🌙 AYDA · MISSION CONTROL</span>
             </h1>
-            <h1 className="text-[16px] font-black tracking-tighter text-white uppercase italic leading-none sm:hidden">
+            <h1 className="text-[14px] sm:text-[16px] font-black tracking-tighter text-white uppercase italic leading-none sm:hidden">
               🌙 AYDA
             </h1>
             <div className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center">
@@ -153,7 +153,7 @@ export function Header({ status, onMenuClick }: HeaderProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 md:gap-6">
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-6">
         
         {/* REACTOR STATUS (QUOTA & FUEL) */}
         <div className="hidden md:flex items-center gap-4 px-3 py-1.5 bg-[#0a0a0a] border border-[#222] rounded-lg">

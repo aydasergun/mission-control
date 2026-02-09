@@ -191,7 +191,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="hidden lg:block w-[380px] h-full border-l border-[#1a1a1a] bg-[#050505]/40 backdrop-blur-xl z-20"><MonitoringPanel logs={logs} vpsStats={vpsStats} /></div>
+      <div className="hidden xl:block w-[380px] h-full border-l border-[#1a1a1a] bg-[#050505]/40 backdrop-blur-xl z-20"><MonitoringPanel logs={logs} vpsStats={vpsStats} /></div>
     </main>
   );
 }
