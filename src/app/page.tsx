@@ -24,6 +24,7 @@ export default function Home() {
   const [gatewayStatus, setGatewayStatus] = useState("OFFLINE");
   const [isMonitoringOpen, setIsMonitoringOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileMonitoringOpen, setIsMobileMonitoringOpen] = useState(false);
   const [command, setCommand] = useState("");
   const [isExecuting, setIsExecuting] = useState(false);
   const [cmdResult, setCmdResult] = useState<{success: boolean, output: string} | null>(null);
@@ -118,7 +119,7 @@ export default function Home() {
   }, [messages, userScrolled]);
 
   return (
-    <main className="flex h-screen w-full overflow-hidden bg-transparent relative">
+    <main className="flex h-screen w-full overflow-hidden overflow-x-hidden bg-transparent relative">
       <SentientCore state={agentState} />
 
       <div className="hidden lg:block w-[80px] h-full border-r border-[#1a1a1a] bg-[#050505]/60 backdrop-blur-xl flex-shrink-0 z-20">
@@ -133,7 +134,12 @@ export default function Home() {
       </div>
 
       <section className="flex-1 flex flex-col relative bg-transparent min-w-0 z-10">
-        <Header status={gatewayStatus} onMenuClick={() => setIsSidebarOpen(true)} />
+        <Header 
+          status={gatewayStatus} 
+          onMenuClick={() => setIsSidebarOpen(true)} 
+          onMonitoringClick={() => setIsMobileMonitoringOpen(true)}
+          showMonitoringToggle={true}
+        />
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 scrollbar-hide pt-6" ref={scrollRef} onScroll={handleScroll}>
           <div className="max-w-3xl mx-auto space-y-10 pb-4">
@@ -191,7 +197,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Desktop Monitoring Panel - Always visible on xl+ */}
       <div className="hidden xl:block w-[380px] h-full border-l border-[#1a1a1a] bg-[#050505]/40 backdrop-blur-xl z-20"><MonitoringPanel logs={logs} vpsStats={vpsStats} /></div>
+
+      {/* Mobile/Tablet Monitoring Panel - Slide-out overlay */}
+      <div className={`fixed inset-0 z-[100] xl:hidden ${isMobileMonitoringOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+        <div 
+          className={`absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${isMobileMonitoringOpen ? 'opacity-100' : 'opacity-0'}`}
+          onClick={() => setIsMobileMonitoringOpen(false)}
+        ></div>
+        <div className={`absolute right-0 top-0 h-full w-[calc(100vw-60px)] max-w-[400px] bg-[#050505] border-l border-[#1a1a1a] transition-transform duration-300 ease-out ${isMobileMonitoringOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <button 
+            onClick={() => setIsMobileMonitoringOpen(false)}
+            className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-lg text-gray-400 hover:text-white transition-colors z-10"
+            aria-label="Close monitoring panel"
+          >
+            <X size={20} />
+          </button>
+          <MonitoringPanel logs={logs} vpsStats={vpsStats} />
+        </div>
+      </div>
     </main>
   );
 }

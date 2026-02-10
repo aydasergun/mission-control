@@ -145,12 +145,12 @@ export default function MessageCard({ content, metadata }: MessageCardProps) {
           </div>
 
           {metadata && (
-             <div className={cn("mt-4 pt-3 flex items-center gap-3 text-[10px] font-medium uppercase tracking-wider border-t relative z-10", isAssistant ? "border-white/10 text-indigo-200/60" : "border-zinc-800/80 text-zinc-500")}>
-                <div className="flex items-center gap-1.5">{getPlatformIcon(metadata.platform)}<span className="font-semibold">{metadata.platform}</span></div>
-                <div className="flex items-center gap-2 ml-auto">
+             <div className={cn("mt-4 pt-3 flex items-center gap-2 sm:gap-3 text-[10px] font-medium uppercase tracking-wider border-t relative z-10 flex-wrap", isAssistant ? "border-white/10 text-indigo-200/60" : "border-zinc-800/80 text-zinc-500")}>
+                <div className="flex items-center gap-1.5 flex-shrink-0">{getPlatformIcon(metadata.platform)}<span className="font-semibold">{metadata.platform}</span></div>
+                <div className="flex items-center gap-2 ml-auto flex-shrink-0">
                    <div className="flex items-center gap-1"><Clock className="w-3 h-3" /><span>{time}</span></div>
-                   <span className="opacity-20">|</span>
-                   <div className="flex items-center gap-1"><Hash className="w-3 h-3" /><span className="font-mono">{metadata.message_id}</span></div>
+                   <span className="opacity-20 hidden sm:inline">|</span>
+                   <div className="hidden sm:flex items-center gap-1"><Hash className="w-3 h-3" /><span className="font-mono truncate max-w-[80px]">{metadata.message_id}</span></div>
                 </div>
              </div>
           )}
