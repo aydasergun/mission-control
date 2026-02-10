@@ -11,6 +11,7 @@ const REQUIRED_KEYS = [
   { key: "GITHUB_TOKEN", value: "" },
   { key: "GOOGLE_CLOUD_API_KEY", value: "" },
   { key: "OPENROUTER_API_KEY", value: "" },
+  { key: "NOTION_API_KEY", value: "" },
   { key: "GOG_KEYRING_PASSWORD", value: "" }
 ];
 
