@@ -17,6 +17,11 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }} # Use password instead
         port: ${{ secrets.VPS_PORT }}
         script: |
+          # Load NVM and PATH for non-interactive shell
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          export PATH=$PATH:/home/ayda/.npm-global/bin
+
           # Navigate to project directory
           cd ~/mission-control
           
