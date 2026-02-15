@@ -1,21 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  Activity, 
-  Cpu, 
-  HeartPulse, 
-  ShieldCheck, 
-  Zap, 
-  Globe, 
-  MessageSquare, 
-  Terminal, 
-  RefreshCw, 
-  AlertTriangle, 
-  Search, 
-  FileText, 
+import {
+  Activity,
+  Cpu,
+  HeartPulse,
+  ShieldCheck,
+  Zap,
+  Globe,
+  MessageSquare,
+  Terminal,
+  RefreshCw,
+  AlertTriangle,
+  Search,
+  FileText,
   Power,
-  X 
+  X
 } from "lucide-react";
 import { LogEntry } from "@/lib/gateway";
 
@@ -47,7 +47,7 @@ export function MonitoringPanel({ logs, vpsStats }: MonitoringPanelProps) {
     if (logs.length > 0) {
       const lastLog = logs[0];
       const logText = (lastLog.msg + " " + (lastLog.detail || "")).toLowerCase();
-      
+
       if (lastLog.msg === 'TICK' || logText.includes('heartbeat')) setLastTick(Date.now());
       if (lastLog.msg === 'HEALTH' || logText.includes('health')) setIsHealthy(!logText.includes('error') && !logText.includes('fail'));
       if (lastLog.msg === 'AGENT' || lastLog.msg === 'TOOL' || logText.includes('tool') || logText.includes('agent')) {
@@ -71,30 +71,30 @@ export function MonitoringPanel({ logs, vpsStats }: MonitoringPanelProps) {
       let detail = log.detail || "";
       let msg = log.msg;
       const lowerDetail = detail.toLowerCase();
-      
+
       // Enhanced descriptions with meaningful who/when/why information
       if (msg === 'AGENT' || msg === 'TOOL' || lowerDetail.includes('tool') || lowerDetail.includes('agent')) {
-        if (lowerDetail.includes('exec') || lowerDetail.includes('terminal') || lowerDetail.includes('shell')) { 
-          msg = 'TOOL'; 
+        if (lowerDetail.includes('exec') || lowerDetail.includes('terminal') || lowerDetail.includes('shell')) {
+          msg = 'TOOL';
           detail = "🔧 **AYDA** sistem komutlarını çalıştırıyor - **ŞU AN**: Terminal işlemi - **NEDEN**: Sistem yönetimi için gerekli komutlar";
         }
-        else if (lowerDetail.includes('read') || lowerDetail.includes('write') || lowerDetail.includes('fs.')) { 
-          msg = 'MEMORY'; 
+        else if (lowerDetail.includes('read') || lowerDetail.includes('write') || lowerDetail.includes('fs.')) {
+          msg = 'MEMORY';
           detail = "💾 **AYDA** dosya sistemine erişiyor - **ŞU AN**: Veri okuma/yazma - **NEDEN**: Dosya tabanlı işlem gereksinimi";
         }
-        else if (lowerDetail.includes('search') || lowerDetail.includes('fetch') || lowerDetail.includes('brave')) { 
-          msg = 'RESEARCH'; 
+        else if (lowerDetail.includes('search') || lowerDetail.includes('fetch') || lowerDetail.includes('brave')) {
+          msg = 'RESEARCH';
           detail = "🔍 **AYDA** web araştırması yapıyor - **ŞU AN**: Veri toplama - **NEDEN**: Kullanıcı sorusuna detaylı cevap hazırlığı";
         }
-        else { 
-          msg = 'AGENT'; 
+        else {
+          msg = 'AGENT';
           detail = "🧠 **AYDA** strateji geliştiriyor - **ŞU AN**: Karmaşık analiz - **NEDEN**: İnsansız görev çözümleme süreci";
         }
-      } else if (msg === 'CHAT' || lowerDetail.includes('message')) { 
-        msg = 'CHAT'; 
+      } else if (msg === 'CHAT' || lowerDetail.includes('message')) {
+        msg = 'CHAT';
         detail = "💬 **AYDA** kullanıcı ile iletişim kuruyor - **ŞU AN**: Mesaj işleme - **NEDEN**: Doğrudan kullanıcı etkileşimi";
       }
-      else if (msg === 'LIFECYCLE') { 
+      else if (msg === 'LIFECYCLE') {
         detail = "⚙️ **SISTEM** optimizasyon yapıyor - **ŞU AN**: Servis bakımı - **NEDEN**: Performans artışı ve kaynak yönetimi";
       }
       else if (msg === 'ERROR') {
@@ -113,7 +113,7 @@ export function MonitoringPanel({ logs, vpsStats }: MonitoringPanelProps) {
           <div className="w-1 h-3 bg-blue-500 rounded-full shadow-[0_0_8px_#3b82f6]"></div>
           Monitoring Center
         </h2>
-        
+
         <div className="flex items-center gap-4 bg-[#111] px-4 py-2 rounded-2xl border border-white/5">
           <StatusIcon icon={HeartPulse} active={Date.now() - lastTick < 5000} color="text-red-500" glow="drop-shadow-[0_0_5px_rgba(239,68,68,0.7)]" tooltip="Sistem Kalp Atışı (Live)" pulse />
           <StatusIcon icon={ShieldCheck} active={isHealthy} color={isHealthy ? "text-[#10b981]" : "text-red-500"} glow={isHealthy ? "drop-shadow-[0_0_5px_rgba(16,185,129,0.7)]" : "drop-shadow-[0_0_5px_rgba(239,68,68,0.7)]"} tooltip={isHealthy ? "Sistem Sağlıklı" : "Kritik Hata Saptandı!"} />
@@ -140,9 +140,9 @@ export function MonitoringPanel({ logs, vpsStats }: MonitoringPanelProps) {
                   <div className="flex flex-col gap-0.5">
                     <div className="flex items-center gap-2">
                       <span className="text-white font-bold tracking-tight">{mapped.label}</span>
-                      <span className="text-[9px] text-white/10">[{log.ts}]</span>
+                      <span className="text-[9px] text-zinc-500">[{log.ts}]</span>
                     </div>
-                    {log.detail && <div className="text-white/30 truncate max-w-[240px] text-[9px] italic">{log.detail}</div>}
+                    {log.detail && <div className="text-zinc-400 truncate max-w-[240px] text-[9px] italic">{log.detail}</div>}
                   </div>
                 </div>
               </div>
