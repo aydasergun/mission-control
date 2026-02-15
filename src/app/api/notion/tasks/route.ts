@@ -26,7 +26,7 @@ export async function GET() {
       return NextResponse.json({ error: "NOTION_API_KEY not found" }, { status: 500 });
     }
 
-    const response = await fetch(`https://api.notion.com/v1/data_sources/${NOTION_DATABASE_ID}/query`, {
+    const response = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${notionKey}`,
@@ -64,6 +64,12 @@ export async function POST(req: Request) {
     const properties: any = {
       "Task": {
         title: [{ text: { content: task } }]
+      },
+      "Kanban - State": {
+        select: { name: "To Do" }
+      },
+      "Priority": {
+        select: { name: "🧀 Medium" }
       }
     };
 

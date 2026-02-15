@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, ChevronDown, Coins, Zap, Brain, Sparkles, Fuel, Timer, RefreshCw, Activity } from "lucide-react";
+import { Menu, ChevronDown, Coins, Brain, Sparkles, HeartPulse, Activity, ShieldCheck, Globe, Monitor } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface HeaderProps {
@@ -49,18 +49,28 @@ const formatModelInfo = (modelId: string) => {
   return { provider, name, tags };
 };
 
+function StatusIcon({ icon: Icon, active, color, glow, tooltip, pulse }: any) {
+  return (
+    <div className="relative group/icon">
+      <div className={`transition-all duration-300 ${active ? `${color} ${glow} scale-110` : 'text-white/10 scale-100'} ${active && pulse ? 'animate-pulse' : ''}`}>
+        <Icon size={14} strokeWidth={2.5} />
+      </div>
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black border border-white/10 text-white text-[8px] font-bold uppercase tracking-wider rounded-lg opacity-0 group-hover/icon:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-2xl">
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-black border-r border-b border-white/10 rotate-45"></div>
+        {tooltip}
+      </div>
+    </div>
+  );
+}
+
 export function Header({ status, onMenuClick, onMonitoringClick, showMonitoringToggle }: HeaderProps) {
   const [currentModel, setCurrentModel] = useState("Loading...");
   const [availableModels, setAvailableModels] = useState<any[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
-  const [usage, setUsage] = useState({ totalTokens: 0, limits: [] as any[] });
 
   useEffect(() => {
     fetchModelInfo();
-    fetchUsage();
-    const usageInterval = setInterval(fetchUsage, 10000);
-    return () => clearInterval(usageInterval);
   }, []);
 
   const fetchModelInfo = async () => {
@@ -69,14 +79,6 @@ export function Header({ status, onMenuClick, onMonitoringClick, showMonitoringT
       const data = await res.json();
       setCurrentModel(data.currentModel);
       setAvailableModels(data.availableModels || []);
-    } catch (e) { console.error(e); }
-  };
-
-  const fetchUsage = async () => {
-    try {
-      const res = await fetch("/api/system/usage");
-      const data = await res.json();
-      setUsage(data);
     } catch (e) { console.error(e); }
   };
 
@@ -96,37 +98,6 @@ export function Header({ status, onMenuClick, onMonitoringClick, showMonitoringT
   };
 
   const currentInfo = formatModelInfo(currentModel);
-  
-  // Find current model limits
-  const currentModelLimit = usage.limits?.find(l => currentModel.includes(l.model)) || { usedPercent: 0, resetAt: null };
-  const fuelPercentage = Math.max(0, 100 - currentModelLimit.usedPercent); // Remaining fuel
-  
-  // Fuel Color Logic
-  let fuelColor = "text-emerald-500";
-  let fuelBg = "bg-emerald-500/20";
-  let fuelBar = "bg-emerald-500";
-  
-  if (fuelPercentage < 20) {
-      fuelColor = "text-red-500";
-      fuelBg = "bg-red-500/20";
-      fuelBar = "bg-red-500";
-  } else if (fuelPercentage < 50) {
-      fuelColor = "text-yellow-500";
-      fuelBg = "bg-yellow-500/20";
-      fuelBar = "bg-yellow-500";
-  }
-
-  // Format Reset Time
-  let resetTimeDisplay = "Ready";
-  if (currentModelLimit.resetAt) {
-      const resetDate = new Date(currentModelLimit.resetAt);
-      if (resetDate > new Date()) {
-          // Calculate minutes left manually for cleaner display than formatDistanceToNow
-          const diffMs = resetDate.getTime() - new Date().getTime();
-          const diffMins = Math.ceil(diffMs / 60000);
-          resetTimeDisplay = `${diffMins}m`;
-      }
-  }
 
   return (
     <header className="h-[72px] bg-[#050505]/90 backdrop-blur-xl border-b border-[#1a1a1a] flex items-center justify-between px-4 md:px-6 sticky top-0 z-50 shadow-sm overflow-visible">
@@ -143,9 +114,9 @@ export function Header({ status, onMenuClick, onMonitoringClick, showMonitoringT
             <h1 className="text-[14px] sm:text-[16px] font-black tracking-tighter text-white uppercase italic leading-none flex-shrink-0 flex items-center">
               {/* Mobile: Simple title */}
               <span className="block sm:hidden">🌙 AYDA</span>
-              {/* Desktop: Full title with glitch effect - !important needed to override glitch-wrapper display:inline-block */}
+              {/* Desktop: Full title with glitch effect */}
               <span className="!hidden sm:!block glitch-wrapper" data-text="🌙 AYDA · MISSION CONTROL">
-                <span className="glitch-text">🌙 AYDA · MISSION CONTROL</span>
+                🌙 AYDA · MISSION CONTROL
               </span>
             </h1>
             <div className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 flex items-center flex-shrink-0">
@@ -162,57 +133,30 @@ export function Header({ status, onMenuClick, onMonitoringClick, showMonitoringT
       {/* Right Section - Actions & Model Selector */}
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-shrink-0">
         
+        {/* System Status Icons - Visible on all devices */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          <StatusIcon icon={HeartPulse} active={true} color="text-red-500" glow="drop-shadow-[0_0_5px_rgba(239,68,68,0.7)]" tooltip="System Heartbeat" pulse />
+          <StatusIcon icon={ShieldCheck} active={true} color="text-[#10b981]" glow="drop-shadow-[0_0_5px_rgba(16,185,129,0.7)]" tooltip="System Healthy" />
+          <StatusIcon icon={Activity} active={true} color="text-blue-500" glow="drop-shadow-[0_0_5px_rgba(59,130,246,0.7)]" tooltip="Ayda Active" />
+          <StatusIcon icon={Globe} active={true} color="text-purple-500" glow="drop-shadow-[0_0_5px_rgba(147,51,234,0.7)]" tooltip="Gateway Connected" />
+        </div>
+
         {/* Monitoring Toggle - Visible on mobile/tablet (hidden on xl+) */}
         {showMonitoringToggle && onMonitoringClick && (
           <button 
             onClick={onMonitoringClick}
-            className="xl:hidden p-2.5 bg-[#111] border border-[#222] rounded-xl hover:border-blue-500/50 transition-all group flex-shrink-0"
+            className="xl:hidden p-2.5 bg-[#111] border border-[#222] rounded-xl hover:border-blue-500/50 transition-all group flex-shrink-0 relative"
             aria-label="Open monitoring panel"
           >
             <Activity size={18} className="text-gray-400 group-hover:text-blue-400 transition-colors" />
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black border border-white/10 text-white text-[9px] font-bold uppercase tracking-wider rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-2xl">
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-black border-r border-b border-white/10 rotate-45"></div>
+              Mobile: System monitoring & controls
+            </div>
           </button>
         )}
         
-        {/* REACTOR STATUS (QUOTA & FUEL) - Desktop only */}
-        <div className="hidden md:flex items-center gap-4 px-3 py-1.5 bg-[#0a0a0a] border border-[#222] rounded-lg">
-          
-          {/* Fuel / Quota */}
-          <div className="flex items-center gap-2 min-w-[80px]">
-             <Fuel size={12} className={fuelColor} />
-             <div className="flex flex-col w-full">
-               <div className="flex justify-between items-center mb-0.5">
-                  <span className="text-[8px] text-gray-500 font-bold uppercase leading-none">Fuel</span>
-                  <span className={`text-[8px] font-bold leading-none ${fuelColor}`}>{fuelPercentage.toFixed(0)}%</span>
-               </div>
-               <div className="w-full h-1 bg-[#222] rounded-full overflow-hidden">
-                  <div className={`h-full ${fuelBar} transition-all duration-500`} style={{ width: `${fuelPercentage}%` }}></div>
-               </div>
-             </div>
-          </div>
 
-          <div className="w-px h-4 bg-[#222]"></div>
-
-          {/* Reset Timer */}
-          <div className="flex items-center gap-2 min-w-[60px]">
-             <RefreshCw size={12} className={currentModelLimit.resetAt && new Date(currentModelLimit.resetAt) > new Date() ? "text-amber-500 animate-pulse" : "text-gray-600"} />
-             <div className="flex flex-col items-start leading-none">
-               <span className="text-[8px] text-gray-500 font-bold uppercase">Reset</span>
-               <span className="text-[10px] text-white font-mono">{resetTimeDisplay}</span>
-             </div>
-          </div>
-          
-           <div className="w-px h-4 bg-[#222]"></div>
-           
-           {/* Total Tokens (Historical) */}
-           <div className="flex items-center gap-2">
-              <Zap size={12} className="text-purple-500" />
-              <div className="flex flex-col items-end leading-none">
-                <span className="text-[8px] text-gray-500 font-bold uppercase">Total</span>
-                <span className="text-[10px] text-white font-mono">{(usage.totalTokens / 1000).toFixed(0)}k</span>
-              </div>
-           </div>
-
-        </div>
 
         {/* MODEL SELECTOR - Always visible, simplified on mobile */}
         <div className="relative flex-shrink-0 min-w-[44px]">
@@ -250,9 +194,8 @@ export function Header({ status, onMenuClick, onMonitoringClick, showMonitoringT
                     const info = formatModelInfo(model.id);
                     const isActive = currentModel === model.id;
                     
-                    // Check limit for this model
-                    const limit = usage.limits?.find(l => model.id.includes(l.model));
-                    const isDepleted = limit && limit.usedPercent >= 95;
+                    // Model availability check (removed fuel quota tracking)
+                    const isDepleted = false; // All models available
                     
                     return (
                       <button
@@ -275,13 +218,8 @@ export function Header({ status, onMenuClick, onMonitoringClick, showMonitoringT
                                  {info.tags.map(tag => (
                                    <span key={tag} className="text-[8px] px-1.5 py-px rounded bg-white/5 text-gray-500 font-medium">{tag}</span>
                                  ))}
-                              </div>
-                              {limit && (
-                                  <span className={`text-[9px] font-mono ${limit.usedPercent > 80 ? 'text-red-500' : 'text-emerald-500'}`}>
-                                      {Math.max(0, 100 - limit.usedPercent).toFixed(0)}% Fuel
-                                  </span>
-                              )}
-                          </div>
+                               </div>
+                           </div>
                         </div>
                       </button>
                     );
@@ -290,7 +228,7 @@ export function Header({ status, onMenuClick, onMonitoringClick, showMonitoringT
               </div>
             </>
           )}
-        </div>
+        </div>  
 
       </div>
     </header>

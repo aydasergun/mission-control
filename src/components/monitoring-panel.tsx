@@ -71,13 +71,38 @@ export function MonitoringPanel({ logs, vpsStats }: MonitoringPanelProps) {
       let detail = log.detail || "";
       let msg = log.msg;
       const lowerDetail = detail.toLowerCase();
-      if (msg === 'AGENT' || msg === 'TOOL' || lowerDetail.includes('tool')) {
-        if (lowerDetail.includes('exec') || lowerDetail.includes('terminal') || lowerDetail.includes('shell')) { msg = 'TOOL'; detail = "Terminalde sistem sorgusu yürütülüyor..."; }
-        else if (lowerDetail.includes('read') || lowerDetail.includes('write') || lowerDetail.includes('fs.')) { msg = 'MEMORY'; detail = "Dosya sistemi üzerinde hafıza kaydı yapılıyor..."; }
-        else if (lowerDetail.includes('search') || lowerDetail.includes('fetch') || lowerDetail.includes('brave')) { msg = 'RESEARCH'; detail = "Web üzerinden derinlemesine araştırma yapılıyor..."; }
-        else { msg = 'AGENT'; detail = "Asistan karmaşık bir görevi analiz ediyor..."; }
-      } else if (msg === 'CHAT' || lowerDetail.includes('message')) { msg = 'CHAT'; detail = "Kullanıcı ile aktif veri alışverişi sağlanıyor."; }
-      else if (msg === 'LIFECYCLE') { detail = "Sistem servisleri (Gateway/UI) optimize ediliyor..."; }
+      
+      // Enhanced descriptions with meaningful who/when/why information
+      if (msg === 'AGENT' || msg === 'TOOL' || lowerDetail.includes('tool') || lowerDetail.includes('agent')) {
+        if (lowerDetail.includes('exec') || lowerDetail.includes('terminal') || lowerDetail.includes('shell')) { 
+          msg = 'TOOL'; 
+          detail = "🔧 **AYDA** sistem komutlarını çalıştırıyor - **ŞU AN**: Terminal işlemi - **NEDEN**: Sistem yönetimi için gerekli komutlar";
+        }
+        else if (lowerDetail.includes('read') || lowerDetail.includes('write') || lowerDetail.includes('fs.')) { 
+          msg = 'MEMORY'; 
+          detail = "💾 **AYDA** dosya sistemine erişiyor - **ŞU AN**: Veri okuma/yazma - **NEDEN**: Dosya tabanlı işlem gereksinimi";
+        }
+        else if (lowerDetail.includes('search') || lowerDetail.includes('fetch') || lowerDetail.includes('brave')) { 
+          msg = 'RESEARCH'; 
+          detail = "🔍 **AYDA** web araştırması yapıyor - **ŞU AN**: Veri toplama - **NEDEN**: Kullanıcı sorusuna detaylı cevap hazırlığı";
+        }
+        else { 
+          msg = 'AGENT'; 
+          detail = "🧠 **AYDA** strateji geliştiriyor - **ŞU AN**: Karmaşık analiz - **NEDEN**: İnsansız görev çözümleme süreci";
+        }
+      } else if (msg === 'CHAT' || lowerDetail.includes('message')) { 
+        msg = 'CHAT'; 
+        detail = "💬 **AYDA** kullanıcı ile iletişim kuruyor - **ŞU AN**: Mesaj işleme - **NEDEN**: Doğrudan kullanıcı etkileşimi";
+      }
+      else if (msg === 'LIFECYCLE') { 
+        detail = "⚙️ **SISTEM** optimizasyon yapıyor - **ŞU AN**: Servis bakımı - **NEDEN**: Performans artışı ve kaynak yönetimi";
+      }
+      else if (msg === 'ERROR') {
+        detail = "🚨 **KRITIK** hata tespit edildi - **ŞU AN**: Hata çözümleme - **NEDEN**: Sistem stabilitesi için acil müdahale";
+      }
+      else if (msg === 'FAILOVER') {
+        detail = "🔄 **SISTEM** model değişimi yapıyor - **ŞU AN**: Geçiş süreci - **NEDEN**: Yüksek performanslı model devreye alma";
+      }
       return { ...log, msg, detail };
     });
 
