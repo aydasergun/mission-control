@@ -2,7 +2,7 @@ name: Deploy Mission Control
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   deploy:
@@ -20,7 +20,7 @@ jobs:
           cd ~/mission-control
           
           # Pull latest changes
-          git pull origin main
+          git pull origin master
           
           # Install dependencies
           npm install
