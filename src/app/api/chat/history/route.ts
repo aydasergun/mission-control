@@ -76,22 +76,37 @@ export async function GET(req: NextRequest) {
              let source = "Terminal";
              let cleanContent = content;
 
-             // Detect source
-             if (content.includes("[Telegram")) {
-               source = "Telegram";
+             // 1. Detect Source based on raw signatures
+             if (content.includes("Conversation info") || content.includes("@bugrasergun") || content.includes("[Telegram")) {
+                source = "Telegram";
+             } else if (content.match(/^\[[a-zA-Z]{3} \d{4}-/)) {
+                // Time-stamped messages usually come from Mission Control / Web Interface
+                source = "Mission Control";
              } else if (role === "assistant") {
-               source = "Ayda";
+                source = "Ayda";
              }
 
-             allMessages.push({
-               id: entry.id || `gen-${Math.random()}`, // Fallback ID
-               role,
-               content: cleanContent,
-               timestamp: entry.timestamp || new Date().toISOString(),
-               source,
-               // Keep raw timestamp for sorting
-               tsValue: new Date(entry.timestamp).getTime()
-             });
+             // 2. Clean Metadata & Noise
+             // Remove "Conversation info ... ```json ... ```" block (aggressive multiline)
+             cleanContent = cleanContent.replace(/Conversation info \(untrusted metadata\):\s*```json[\s\S]*?```/g, "").trim();
+             
+             // Remove "System: [...]" prefix lines
+             cleanContent = cleanContent.replace(/^System: \[.*?\] .*?(\r?\n|$)/gm, "").trim();
+
+             // Remove timestamp prefixes like "[Mon 2026-02-16 15:39 GMT+1]"
+             cleanContent = cleanContent.replace(/^\[[a-zA-Z]{3} \d{4}-\d{2}-\d{2} \d{2}:\d{2} GMT\+\d+\]\s*/g, "").trim();
+
+             if (cleanContent) {
+                 allMessages.push({
+                   id: entry.id || `gen-${Math.random()}`, // Fallback ID
+                   role,
+                   content: cleanContent,
+                   timestamp: entry.timestamp || new Date().toISOString(),
+                   source,
+                   // Keep raw timestamp for sorting
+                   tsValue: new Date(entry.timestamp).getTime()
+                 });
+             }
           }
         }
       }

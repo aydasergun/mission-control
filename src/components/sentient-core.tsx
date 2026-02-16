@@ -20,7 +20,7 @@ export function SentientCore({ state }: SentientCoreProps) {
         setPulseClass("shadow-[0_0_80px_rgba(251,191,36,0.3)] bg-amber-500/10 animate-pulse duration-[1500ms]");
         break;
       case "ACTION":
-        setPulseClass("shadow-[0_0_100px_rgba(249,115,22,0.4)] bg-orange-500/20 animate-ping-slow duration-[1000ms]");
+        setPulseClass("shadow-[0_0_100px_rgba(255,255,255,0.4)] bg-white/20 animate-ping duration-[1000ms]");
         break;
       case "ERROR":
         setPulseClass("shadow-[0_0_50px_rgba(239,68,68,0.4)] bg-red-500/20 animate-glitch");
@@ -32,7 +32,7 @@ export function SentientCore({ state }: SentientCoreProps) {
   const bgGradient = 
     state === "IDLE" ? "from-blue-900/5 via-black to-black" :
     state === "THINKING" ? "from-amber-900/10 via-black to-black" :
-    state === "ACTION" ? "from-orange-900/10 via-black to-black" :
+    state === "ACTION" ? "from-gray-900/10 via-black to-black" :
     "from-red-900/10 via-black to-black";
 
   return (

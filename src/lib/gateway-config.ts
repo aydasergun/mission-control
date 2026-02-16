@@ -1,4 +1,4 @@
 export const GATEWAY_CONFIG = {
-  url: "ws://localhost:18789",
-  token: "AidaSetup2026"
+  url: "ws://127.0.0.1:18789",
+  token: "AidaFinal2026"
 };
