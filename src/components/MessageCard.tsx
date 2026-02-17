@@ -98,8 +98,8 @@ export default function MessageCard({ content, metadata }: MessageCardProps) {
 
         <div className={cn("relative p-5 shadow-sm overflow-hidden backdrop-blur-sm transition-all duration-300 border", 
           isAssistant 
-            ? "bg-gradient-to-br from-indigo-600 to-violet-700 border-indigo-500/20 text-white rounded-2xl rounded-tl-none shadow-indigo-500/10" 
-            : "bg-zinc-900/80 border-zinc-800 text-zinc-100 rounded-2xl rounded-tr-none hover:bg-zinc-900"
+            ? "bg-indigo-600/50 backdrop-blur-lg border-indigo-500/30 text-white rounded-2xl rounded-tl-none shadow-indigo-500/20" 
+            : "bg-zinc-900/50 backdrop-blur-lg border-zinc-800/50 text-zinc-100 rounded-2xl rounded-tr-none hover:bg-zinc-900/70"
         )}>
           <div className="relative z-10">
             

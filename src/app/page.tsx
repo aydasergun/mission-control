@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
-import { Terminal, Menu, X, Activity, CheckCircle, AlertCircle, Image as ImageIcon, Bot, User, Smartphone, MessageCircle, Hash, Clock, Globe, Zap } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Terminal, Menu, X, Activity, CheckCircle, AlertCircle, Image as ImageIcon, Bot, User, Smartphone, MessageCircle, Hash, Clock, Globe, Zap, Send } from "lucide-react";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { MonitoringPanel } from "@/components/monitoring-panel";
 import { SentientCore } from "@/components/sentient-core";
 import { connectToGateway, LogEntry } from "@/lib/gateway";
 import MessageCard from "@/components/MessageCard";
+import CommandHints from "@/components/CommandHints";
 
 type ChatMessage = {
   id: string;
@@ -29,9 +31,30 @@ export default function Home() {
   const [isExecuting, setIsExecuting] = useState(false);
   const [cmdResult, setCmdResult] = useState<{success: boolean, output: string} | null>(null);
   const [agentState, setAgentState] = useState<"IDLE" | "THINKING" | "ACTION" | "ERROR">("IDLE");
+  const [isSending, setIsSending] = useState(false);
   const [sendMessageFn, setSendMessageFn] = useState<(msg: string) => boolean>(() => () => false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
+
+  // Auto-resize logic with dependency on command content
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [command]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCommand(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleInputSubmit();
+    }
+  };
 
   const fetchChatHistory = async () => {
     try {
@@ -55,8 +78,11 @@ export default function Home() {
 
   const handleInputSubmit = async () => {
     if (!command.trim()) return;
-    if (command.startsWith("/") || command.startsWith(">")) {
-        const cleanCmd = command.startsWith("/") ? command.slice(1) : command.slice(1);
+
+    const currentMsg = command;
+
+    if (currentMsg.startsWith("/") || currentMsg.startsWith(">")) {
+        const cleanCmd = currentMsg.startsWith("/") ? currentMsg.slice(1) : currentMsg.slice(1);
         setIsExecuting(true);
         setAgentState("ACTION");
         setCmdResult(null);
@@ -77,12 +103,14 @@ export default function Home() {
             setTimeout(() => setAgentState("IDLE"), 2000);
         }
     } else {
-        const sent = sendMessageFn(command);
+        setIsSending(true);
+        const sent = sendMessageFn(currentMsg);
         if (sent) {
             setCommand("");
             setAgentState("ACTION");
             setTimeout(() => setAgentState("IDLE"), 1000);
         }
+        setTimeout(() => setIsSending(false), 2000); // Wait for flight animation
     }
   };
   
@@ -164,34 +192,69 @@ export default function Home() {
 
         <div className="p-4 md:p-6 bg-gradient-to-t from-[#050505] to-transparent">
           <div className="max-w-3xl mx-auto space-y-4">
-            <div className={`flex items-center gap-3 bg-[#0d0d0d] border p-2 pl-5 rounded-2xl transition-all relative group ${isExecuting ? 'border-blue-500/50 shadow-[0_0_20px_rgba(37,99,235,0.1)] ring-4 ring-blue-500/10' : 'border-[#1a1a1a] focus-within:border-blue-500/30'}`}>
+            <div className={`flex items-center gap-3 bg-[#0d0d0d]/60 backdrop-blur-xl border p-2 pl-5 rounded-2xl transition-all relative group ${isExecuting ? 'border-blue-500/50 shadow-[0_0_20px_rgba(37,99,235,0.1)] ring-4 ring-blue-500/10' : 'border-[#1a1a1a] focus-within:border-blue-500/30 focus-within:shadow-[0_0_20px_rgba(37,99,235,0.1)]'}`}>
+              <CommandHints show={command.startsWith('/')} />
               <div className={`absolute inset-0 rounded-2xl bg-blue-500/5 opacity-0 transition-opacity duration-500 ${isExecuting ? 'opacity-100 animate-pulse' : ''}`} />
               <Activity size={16} className={isExecuting ? 'text-blue-500 animate-spin' : 'text-zinc-600 group-hover:text-blue-400 transition-colors'} />
-              <input 
-                type="text" 
-                placeholder="Mesaj yaz..." 
-                className="bg-transparent border-none outline-none flex-1 text-sm text-zinc-200 py-3 placeholder:text-zinc-700 relative z-10" 
-                value={command} 
-                onChange={(e) => setCommand(e.target.value)} 
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleInputSubmit();
-                  }
-                }} 
-                disabled={isExecuting} 
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                placeholder="Mesaj yaz..."
+                className="bg-transparent border-none outline-none flex-1 text-sm text-zinc-200 py-3 placeholder:text-zinc-700 relative z-10 resize-none overflow-y-hidden"
+                value={command}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                disabled={isExecuting}
+                style={{ height: 'auto', minHeight: '44px' }}
               />
-              <button 
+              <motion.button 
                 onClick={handleInputSubmit} 
                 disabled={isExecuting || !command.trim()} 
-                className={`relative z-10 text-white text-[10px] font-black px-6 py-3 rounded-xl uppercase tracking-widest transition-all overflow-hidden ${isExecuting || !command.trim() ? 'bg-zinc-900 text-zinc-700' : 'bg-blue-600 hover:bg-blue-500 hover:shadow-[0_0_15px_rgba(37,99,235,0.5)] hover:scale-105 active:scale-95'}`}
+                className={`relative z-10 text-white text-[10px] font-black px-6 py-3 rounded-xl uppercase tracking-widest transition-all overflow-hidden flex items-center justify-center h-[48px] w-[120px] ${isExecuting || !command.trim() ? 'bg-zinc-900 text-zinc-700' : 'bg-blue-600'}`}
+                whileHover="hover"
+                initial="initial"
               >
-                {isExecuting ? (
-                  <span className="animate-pulse">Wait</span>
-                ) : (
-                  <span className="flex items-center gap-2">Send <Zap size={12} className="fill-current" /></span>
-                )}
-              </button>
+                <AnimatePresence mode="wait">
+                  {isExecuting ? (
+                    <motion.span 
+                      key="waiting"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                    >
+                      Wait
+                    </motion.span>
+                  ) : (
+                    <motion.span 
+                      key="send" 
+                      className="flex items-center gap-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                    >
+                      Send 
+                      <motion.div
+                        variants={{
+                          initial: { rotate: 0, x: 0, opacity: 1 },
+                          hover: { rotate: 45, transition: { type: "spring", stiffness: 300, damping: 15 } }
+                        }}
+                        animate={isSending ? { 
+                          rotate: 45, 
+                          x: 40, 
+                          opacity: 0, 
+                          transition: { 
+                            rotate: { duration: 0.1 }, // Önce hemen burnunu düzelt
+                            x: { delay: 0.1, duration: 0.7, ease: "easeIn" }, // Sonra uçuşa geç
+                            opacity: { delay: 0.1, duration: 0.7 }
+                          } 
+                        } : undefined}
+                      >
+                        <Send size={12} />
+                      </motion.div>
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
             </div>
           </div>
         </div>
