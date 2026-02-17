@@ -23,7 +23,7 @@ jobs:
           export PATH=$PATH:/home/ayda/.npm-global/bin
 
           # Navigate to project directory
-          cd ~/mission-control
+          cd ~/.openclaw/workspace/projects/mission-control/src
           
           # Pull latest changes
           git pull origin master
@@ -34,5 +34,6 @@ jobs:
           # Build the application
           npm run build
           
-          # Restart the application using PM2
-          pm2 restart mission-control
+          # Restart the application using PM2 (Ensures correct cwd)
+          pm2 delete mission-control || true
+          pm2 start npm --name "mission-control" -- start -- -p 3001
